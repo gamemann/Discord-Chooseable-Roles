@@ -41,7 +41,6 @@ def connect(cfg, conn):
                 else:
                     await msg.channel.send("**Successfully** added role!")
         # Remove role from allowed list.
-        # Add Discord role to manage commands.
         if msg.content.startswith("/dcr_delrole"):
             args = msg.content.split()
 
