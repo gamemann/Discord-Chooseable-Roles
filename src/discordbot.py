@@ -70,4 +70,4 @@ def connect(cfg, conn):
             await msg.channel.send(tosend)
             
     
-    client.run(cfg["BotToken"])
+    client.run(cfg['BotToken'])

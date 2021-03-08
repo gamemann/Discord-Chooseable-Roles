@@ -27,10 +27,10 @@ def addrole(conn, guildid, role):
     query = cur.fetchone()
 
     if len(query) > 0 and query != None:
-        results = query["roles"]
+        results = query['roles']
 
     roles = json.loads(results)
-    roles["roles"].append(role)
+    roles['roles'].append(role)
     rolesjson = json.dumps(roles)
 
     cur.execute("INSERT OR REPLACE INTO `permissions` (`guildid`, `roles`) VALUES (?, ?)", (guildid, rolesjson))
@@ -53,9 +53,9 @@ def delrole(conn, guildid, role):
     if len(results) < 1 or results == None:
         return 1
 
-    roles = json.loads(results["roles"])
-    if role in roles["roles"]:
-        roles["roles"].remove(role)
+    roles = json.loads(results['roles'])
+    if role in roles['roles']:
+        roles['roles'].remove(role)
     rolesjson = json.dumps(roles)
 
     cur.execute("INSERT OR REPLACE INTO `permissions` (`guildid`, `roles`) VALUES (?, ?)", (guildid, rolesjson))
@@ -68,7 +68,7 @@ def delrole(conn, guildid, role):
 
 def getroles(conn, guildid):
     roles = {}
-    roles["roles"] = []
+    roles['roles'] = []
     cur = conn.cursor()
 
     cur.execute("SELECT `roles` FROM `permissions` WHERE `guildid`=?", (guildid,))
@@ -77,6 +77,6 @@ def getroles(conn, guildid):
     results = cur.fetchone()
 
     if len(results) > 0 and results != None:
-        roles = json.loads(results["roles"])
+        roles = json.loads(results['roles'])
 
-    return roles["roles"]
+    return roles['roles']
