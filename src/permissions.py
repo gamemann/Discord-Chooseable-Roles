@@ -30,7 +30,11 @@ def addrole(conn, guildid, role):
         results = query['roles']
 
     roles = json.loads(results)
-    roles['roles'].append(role)
+
+    # Ensure the role doesn't exist.
+    if role not in roles['roles']:
+        roles['roles'].append(role)
+        
     rolesjson = json.dumps(roles)
 
     cur.execute("INSERT OR REPLACE INTO `permissions` (`guildid`, `roles`) VALUES (?, ?)", (guildid, rolesjson))
@@ -54,8 +58,11 @@ def delrole(conn, guildid, role):
         return 1
 
     roles = json.loads(results['roles'])
+
+    # Check if the role does indeed exist.
     if role in roles['roles']:
         roles['roles'].remove(role)
+
     rolesjson = json.dumps(roles)
 
     cur.execute("INSERT OR REPLACE INTO `permissions` (`guildid`, `roles`) VALUES (?, ?)", (guildid, rolesjson))
