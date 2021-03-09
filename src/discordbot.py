@@ -12,6 +12,7 @@ bot = commands.Bot(command_prefix='!')
 cooldown = {}
 
 async def handlecooldown(userid, cfg, guild):
+    # Check cooldown for specific user. If they don't exist, create new element in cooldown for the user doing `curtime + cooldowntime` as value.
     if cooldown != None and cooldown.get(userid, None) != None and cooldown[userid] > int(time.time()):
         user = await guild.fetch_member(userid)
         timetowait = cooldown[userid] - int(time.time())
@@ -36,6 +37,7 @@ def connect(cfg, conn):
 
     @bot.command()
     async def dcr_addrole(ctx, name=None):
+        usage = "**Usage** - !dcr_addrole <role name>"
         msg = ctx.message
 
         roles = permissions.getroles(conn, msg.guild.id)
@@ -45,12 +47,19 @@ def connect(cfg, conn):
             return
 
         if name == None:
-            await msg.channel.send("You did not supply a role to add.", delete_after=cfg["BotMsgStayTime"])
+            await msg.channel.send(usage + "\n\nError - You did not supply a role to add.", delete_after=cfg["BotMsgStayTime"])
 
             return
         
         role = discord.utils.get(msg.guild.roles, name=name)
 
+        # Check role.
+        if role == None:
+            ctx.channel.send("Could not find role specified.")
+
+            return
+
+        # Ensure role isn't already allowed.
         if role.id in roles:
             await msg.channel.send("Role already allowed.", delete_after=cfg["BotMsgStayTime"])
 
@@ -66,6 +75,7 @@ def connect(cfg, conn):
 
     @bot.command()
     async def dcr_delrole(ctx, name=None):
+        usage = "**Usage** - !dcr_delrole <role name>"
         msg = ctx.message
 
         roles = permissions.getroles(conn, msg.guild.id)
@@ -75,12 +85,19 @@ def connect(cfg, conn):
             return
 
         if name == None:
-            await msg.channel.send("You did not supply a role to remove.", delete_after=cfg["BotMsgStayTime"])
+            await msg.channel.send(usage + "\n\nError - You did not supply a role to remove.", delete_after=cfg["BotMsgStayTime"])
 
             return
 
         role = discord.utils.get(msg.guild.roles, name=name)
 
+        # Check role.
+        if role == None:
+            ctx.channel.send("Could not find role specified.")
+
+            return
+
+        # Ensure role isn't already not allowed.
         if role.id not in roles:
             await msg.channel.send("Role already isn't allowed.", delete_after=cfg["BotMsgStayTime"])
 
@@ -123,7 +140,6 @@ def connect(cfg, conn):
 
         # Add message to current channel.
         newmsg = await ctx.channel.send(contents.replace(r'\n', '\n'))
-        print (str(contents))
 
         cur.execute("INSERT INTO `messages` (`msgid`, `guildid`, `maxreactions`, `contents`) VALUES (?, ?, ?, ?)", (newmsg.id, ctx.guild.id, maxreactions, contents))
         conn.commit()
@@ -138,8 +154,13 @@ def connect(cfg, conn):
 
             return
 
-        # Fetch message by ID.
-        msg = await ctx.fetch_message(msgid)
+        # Retrieve message by ID.
+        try:
+            msg = await ctx.fetch_message(msgid)
+        except NotFound:
+            await ctx.channel.send("Message ID not found inside of guild.", delete_after=cfg["BotMsgStayTime"])
+
+            return
 
         # Initialize setparams and set our where clauses.
         setparams = {}
@@ -169,8 +190,13 @@ def connect(cfg, conn):
 
             return
 
-        # Fetch message by ID.
-        msg = await ctx.fetch_message(msgid)
+        # Retrieve message by ID.
+        try:
+            msg = await ctx.fetch_message(msgid)
+        except NotFound:
+            await ctx.channel.send("Message ID not found inside of guild.", delete_after=cfg["BotMsgStayTime"])
+
+            return
 
         # Delete message from messages table.
         cur.execute("DELETE FROM `messages` WHERE `msgid`=? AND `guildid`=?", (msg.id, ctx.guild.id))
@@ -202,7 +228,12 @@ def connect(cfg, conn):
             return
         
         # Retrieve message by ID.
-        msg = await ctx.fetch_message(msgid)
+        try:
+            msg = await ctx.fetch_message(msgid)
+        except NotFound:
+            await ctx.channel.send("Message ID not found inside of guild.", delete_after=cfg["BotMsgStayTime"])
+
+            return
 
         # Convert emoji into acceptable text.
         name = base64.b64encode(reaction.encode()).decode("utf-8")
@@ -235,7 +266,12 @@ def connect(cfg, conn):
             return
         
         # Retrieve message by ID.
-        msg = await ctx.fetch_message(msgid)
+        try:
+            msg = await ctx.fetch_message(msgid)
+        except NotFound:
+            await ctx.channel.send("Message ID not found inside of guild.", delete_after=cfg["BotMsgStayTime"])
+
+            return
 
         # Convert emoji into acceptable text.
         name = base64.b64encode(reaction.encode()).decode("utf-8")
