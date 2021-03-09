@@ -5,7 +5,8 @@ import sqlite3
 def setuptables(conn):
     cur = conn.cursor()
 
-    cur.execute("CREATE TABLE IF NOT EXISTS `servers` (id integer PRIMARY KEY, name text)")
+    #cur.execute("CREATE TABLE IF NOT EXISTS `servers` (id integer PRIMARY KEY, name text)")
+    cur.execute("CREATE TABLE IF NOT EXISTS `reactions` (id integer PRIMARY KEY AUTOINCREMENT, userid integer, msgid integer, reaction text)")
     cur.execute("CREATE TABLE IF NOT EXISTS `messages` (id integer PRIMARY KEY, guildid integer)")
     cur.execute("CREATE TABLE IF NOT EXISTS `config` (key text PRIMARY KEY, value text)")
     cur.execute("CREATE TABLE IF NOT EXISTS `permissions` (guildid integer PRIMARY KEY, roles text)")
