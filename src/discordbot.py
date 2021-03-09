@@ -47,7 +47,7 @@ def connect(cfg, conn):
             return
 
         if name == None:
-            await msg.channel.send(usage + "\n\nError - You did not supply a role to add.", delete_after=cfg["BotMsgStayTime"])
+            await msg.channel.send(usage + "\n\nError - You did not supply a role to add.", delete_after=cfg['BotMsgStayTime'])
 
             return
         
@@ -61,7 +61,7 @@ def connect(cfg, conn):
 
         # Ensure role isn't already allowed.
         if role.id in roles:
-            await msg.channel.send("Role already allowed.", delete_after=cfg["BotMsgStayTime"])
+            await msg.channel.send("Role already allowed.", delete_after=cfg['BotMsgStayTime'])
 
             return
 
@@ -69,9 +69,9 @@ def connect(cfg, conn):
         err = permissions.addrole(conn, msg.guild.id, role.id)
 
         if err:
-            await msg.channel.send("Did not add role successfully (Err # => " + str(err) + ").", delete_after=cfg["BotMsgStayTime"])
+            await msg.channel.send("Did not add role successfully (Err # => " + str(err) + ").", delete_after=cfg['BotMsgStayTime'])
         else:
-            await msg.channel.send("**Successfully** added role!", delete_after=cfg["BotMsgStayTime"])
+            await msg.channel.send("**Successfully** added role!", delete_after=cfg['BotMsgStayTime'])
 
     @bot.command()
     async def dcr_delrole(ctx, name=None):
@@ -85,7 +85,7 @@ def connect(cfg, conn):
             return
 
         if name == None:
-            await msg.channel.send(usage + "\n\nError - You did not supply a role to remove.", delete_after=cfg["BotMsgStayTime"])
+            await msg.channel.send(usage + "\n\nError - You did not supply a role to remove.", delete_after=cfg['BotMsgStayTime'])
 
             return
 
@@ -99,7 +99,7 @@ def connect(cfg, conn):
 
         # Ensure role isn't already not allowed.
         if role.id not in roles:
-            await msg.channel.send("Role already isn't allowed.", delete_after=cfg["BotMsgStayTime"])
+            await msg.channel.send("Role already isn't allowed.", delete_after=cfg['BotMsgStayTime'])
 
             return
 
@@ -107,9 +107,9 @@ def connect(cfg, conn):
         err = permissions.delrole(conn, msg.guild.id, role.id)
 
         if err:
-            await msg.channel.send("Did not delete role successfully (Err # => " + str(err) + ").", delete_after=cfg["BotMsgStayTime"])
+            await msg.channel.send("Did not delete role successfully (Err # => " + str(err) + ").", delete_after=cfg['BotMsgStayTime'])
         else:
-            await msg.channel.send("**Successfully** deleted role!", delete_after=cfg["BotMsgStayTime"])
+            await msg.channel.send("**Successfully** deleted role!", delete_after=cfg['BotMsgStayTime'])
 
     @bot.command()
     async def dcr_listroles(ctx):
@@ -126,7 +126,7 @@ def connect(cfg, conn):
             role = discord.utils.get(msg.guild.roles, id=roleid)
             tosend = tosend + "- " + role.name + "\n"
 
-        await msg.channel.send(tosend, delete_after=cfg["BotMsgStayTime"])
+        await msg.channel.send(tosend, delete_after=cfg['BotMsgStayTime'])
 
     @bot.command()
     async def dcr_addmsg(ctx, maxreactions=1, contents=""):
@@ -150,7 +150,7 @@ def connect(cfg, conn):
         usage = "**Usage**: !dcr_editmsg <msgid> <maxreactions=None> <contents=None>."
         
         if msgid == None:
-            await ctx.channel.send(usage + "\n\nError - Please specify a message ID to edit.", delete_after=cfg["BotMsgStayTime"])
+            await ctx.channel.send(usage + "\n\nError - Please specify a message ID to edit.", delete_after=cfg['BotMsgStayTime'])
 
             return
 
@@ -158,7 +158,7 @@ def connect(cfg, conn):
         try:
             msg = await ctx.fetch_message(msgid)
         except NotFound:
-            await ctx.channel.send("Message ID not found inside of guild.", delete_after=cfg["BotMsgStayTime"])
+            await ctx.channel.send("Message ID not found inside of guild.", delete_after=cfg['BotMsgStayTime'])
 
             return
 
@@ -178,7 +178,7 @@ def connect(cfg, conn):
         # Use our helper function to update the row inside of the messages table.
         db.updateoptional(conn, "messages", setparams, whereparams)
 
-        await ctx.channel.send("Updated message **successsfully**!", delete_after=cfg["BotMsgStayTime"])
+        await ctx.channel.send("Updated message **successsfully**!", delete_after=cfg['BotMsgStayTime'])
 
     @bot.command()
     async def dcr_delmsg(ctx, msgid=None):
@@ -186,7 +186,7 @@ def connect(cfg, conn):
         usage = "**Usage**: !dcr_delmsg <msgid>."
 
         if msgid == None:
-            await ctx.channel.send(usage + "\n\nError - Please specify a message ID to edit.", delete_after=cfg["BotMsgStayTime"])
+            await ctx.channel.send(usage + "\n\nError - Please specify a message ID to edit.", delete_after=cfg['BotMsgStayTime'])
 
             return
 
@@ -194,7 +194,7 @@ def connect(cfg, conn):
         try:
             msg = await ctx.fetch_message(msgid)
         except NotFound:
-            await ctx.channel.send("Message ID not found inside of guild.", delete_after=cfg["BotMsgStayTime"])
+            await ctx.channel.send("Message ID not found inside of guild.", delete_after=cfg['BotMsgStayTime'])
 
             return
 
@@ -205,7 +205,7 @@ def connect(cfg, conn):
         # Remove the message from the Discord channel itself.
         await msg.delete()
 
-        await ctx.channel.send("Deleted message **successsfully**!", delete_after=cfg["BotMsgStayTime"])
+        await ctx.channel.send("Deleted message **successsfully**!", delete_after=cfg['BotMsgStayTime'])
 
     @bot.command()
     async def dcr_addreaction(ctx, msgid=None, reaction=None, rolename=None):
@@ -213,17 +213,17 @@ def connect(cfg, conn):
         usage = "**Usage** - !dcr_addreaction <msgid> <reaction> <role name>."
 
         if msgid == None:
-            await ctx.channel.send(usage + "\n\n**Error** - Please specify a message ID to add the reaction to.", delete_after=cfg["BotMsgStayTime"])
+            await ctx.channel.send(usage + "\n\n**Error** - Please specify a message ID to add the reaction to.", delete_after=cfg['BotMsgStayTime'])
 
             return
 
         if reaction == None:
-            await ctx.channel.send(usage + "\n\n**Error** - Please specify a reaction to add.", delete_after=cfg["BotMsgStayTime"])
+            await ctx.channel.send(usage + "\n\n**Error** - Please specify a reaction to add.", delete_after=cfg['BotMsgStayTime'])
 
             return
 
         if rolename == None:
-            await ctx.channel.send(usage + "\n\n**Error** - Please specify a role name for the user to retrieve on reaction.", delete_after=cfg["BotMsgStayTime"])
+            await ctx.channel.send(usage + "\n\n**Error** - Please specify a role name for the user to retrieve on reaction.", delete_after=cfg['BotMsgStayTime'])
 
             return
         
@@ -231,7 +231,7 @@ def connect(cfg, conn):
         try:
             msg = await ctx.fetch_message(msgid)
         except NotFound:
-            await ctx.channel.send("Message ID not found inside of guild.", delete_after=cfg["BotMsgStayTime"])
+            await ctx.channel.send("Message ID not found inside of guild.", delete_after=cfg['BotMsgStayTime'])
 
             return
 
@@ -248,7 +248,7 @@ def connect(cfg, conn):
         # Add reaction to message.
         await msg.add_reaction(reaction)
 
-        await ctx.channel.send("**Successfully** added reaction.", delete_after=cfg["BotMsgStayTime"])
+        await ctx.channel.send("**Successfully** added reaction.", delete_after=cfg['BotMsgStayTime'])
 
     @bot.command()
     async def dcr_delreaction(ctx, msgid=None, reaction=None):
@@ -256,12 +256,12 @@ def connect(cfg, conn):
         usage = "**Usage** - !dcr_delreaction <msgid> <reaction>."
 
         if msgid == None:
-            await ctx.channel.send(usage + "\n\n**Error** - Please specify a message ID to delete the reaction from.", delete_after=cfg["BotMsgStayTime"])
+            await ctx.channel.send(usage + "\n\n**Error** - Please specify a message ID to delete the reaction from.", delete_after=cfg['BotMsgStayTime'])
 
             return
 
         if reaction == None:
-            await ctx.channel.send(usage + "\n\n**Error** - Please specify a reaction to delete.", delete_after=cfg["BotMsgStayTime"])
+            await ctx.channel.send(usage + "\n\n**Error** - Please specify a reaction to delete.", delete_after=cfg['BotMsgStayTime'])
 
             return
         
@@ -269,7 +269,7 @@ def connect(cfg, conn):
         try:
             msg = await ctx.fetch_message(msgid)
         except NotFound:
-            await ctx.channel.send("Message ID not found inside of guild.", delete_after=cfg["BotMsgStayTime"])
+            await ctx.channel.send("Message ID not found inside of guild.", delete_after=cfg['BotMsgStayTime'])
 
             return
 
@@ -283,7 +283,7 @@ def connect(cfg, conn):
         # Add reaction to message.
         await msg.remove_reaction(reaction, bot.user)
 
-        await ctx.channel.send("**Successfully** removed reaction.", delete_after=cfg["BotMsgStayTime"])
+        await ctx.channel.send("**Successfully** removed reaction.", delete_after=cfg['BotMsgStayTime'])
 
     @bot.command()
     async def dcr_clearuser(ctx, userid=None):
@@ -299,7 +299,7 @@ def connect(cfg, conn):
         try:
             user = await ctx.guild.fetch_member(userid)
         except NotFound:
-            ctx.channel.send("**WARNING** - User not found. We will continue with clearing the user, though.", delete_after=cfg["BotMsgStayTime"])
+            ctx.channel.send("**WARNING** - User not found. We will continue with clearing the user, though.", delete_after=cfg['BotMsgStayTime'])
 
         # Execute query to delete all rows in `reactions` table from user.
         cur.execute("DELETE FROM `reactions` WHERE `userid`=? AND `msgid`=? AND `guildid`=?", (int(userid), ctx.message.id, ctx.guild.id))
