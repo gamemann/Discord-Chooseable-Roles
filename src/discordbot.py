@@ -1,78 +1,93 @@
 import os
 import base64
 import discord
+from discord.ext import commands
 
 import permissions
 
 def connect(cfg, conn):
-    client = discord.Client()
+    bot = commands.Bot(command_prefix='!')
 
-    @client.event
+    @bot.event
     async def on_ready():
         print("Successfully connected to Discord.")
 
-    @client.event
-    async def on_message(msg):
-        # Ignore messages from the bot itself.
-        if msg.author == client.user:
-            return
+    @bot.command()
+    async def dcr_addrole(ctx, name=None):
+        msg = ctx.message
 
-        # Check for permission.
         roles = permissions.getroles(conn, msg.guild.id)
+
+        # Ensure they have permission and check name argument.
         if not permissions.hasperm(conn, roles, msg.author):
             return
+
+        if name == None:
+            await msg.channel.send("You did not supply a role to add.")
+            return
         
-        # Add Discord role to manage commands.
-        if msg.content.startswith("/dcr_addrole"):
-            args = msg.content.split()
+        role = discord.utils.get(msg.guild.roles, name=name)
 
-            if len(args) < 2:
-                await msg.channel.send("You did not supply a role to add.")
-            else:
-                role = discord.utils.get(msg.guild.roles, name=args[1])
+        if role.id in roles:
+            await msg.channel.send("Role already allowed.")
+            return
 
-                if role.id in roles:
-                    await msg.channel.send("Role already allowed.")
-                    return
+        # Add role.
+        err = permissions.addrole(conn, msg.guild.id, role.id)
 
-                err = permissions.addrole(conn, msg.guild.id, role.id)
+        if err:
+            await msg.channel.send("Did not add role successfully (Err # => " + str(err) + ").")
+        else:
+            await msg.channel.send("**Successfully** added role!")
 
-                if err:
-                    await msg.channel.send("Did not add role successfully (Err # => " + str(err) + ").")
-                else:
-                    await msg.channel.send("**Successfully** added role!")
-        # Remove role from allowed list.
-        if msg.content.startswith("/dcr_delrole"):
-            args = msg.content.split()
+    @bot.command()
+    async def dcr_delrole(ctx, name=None):
+        msg = ctx.message
 
-            if len(args) < 2:
-                await msg.channel.send("You did not supply a role to delete/remove.")
-            else:
-                role = discord.utils.get(msg.guild.roles, name=args[1])
+        roles = permissions.getroles(conn, msg.guild.id)
+        
+        # Ensure they have permission and check name argument.
+        if not permissions.hasperm(conn, roles, msg.author):
+            return
 
-                if role.id not in roles:
-                    await msg.channel.send("Role already isn't allowed.")
-                    return
+        if name == None:
+            await msg.channel.send("You did not supply a role to remove.")
+            return
 
-                err = permissions.delrole(conn, msg.guild.id, role.id)
+        role = discord.utils.get(msg.guild.roles, name=name)
 
-                if err:
-                    await msg.channel.send("Did not delete role successfully (Err # => " + str(err) + ").")
-                else:
-                    await msg.channel.send("**Successfully** deleted role!")
-        # List allowed roles.
-        elif msg.content.startswith("/dcr_listroles"):
-            tosend = "**Allowed roles**\n"
+        if role.id not in roles:
+            await msg.channel.send("Role already isn't allowed.")
+            return
 
-            for roleid in roles:
-                role = discord.utils.get(msg.guild.roles, id=roleid)
-                tosend = tosend + "- " + role.name + "\n"
+        # Delete role.
+        err = permissions.delrole(conn, msg.guild.id, role.id)
 
-            await msg.channel.send(tosend)
+        if err:
+            await msg.channel.send("Did not delete role successfully (Err # => " + str(err) + ").")
+        else:
+            await msg.channel.send("**Successfully** deleted role!")
 
-    @client.event
+    @bot.command()
+    async def dcr_listroles(ctx):
+        msg = ctx.message
+
+        roles = permissions.getroles(conn, msg.guild.id)
+        
+        if not permissions.hasperm(conn, roles, msg.author):
+            return
+
+        tosend = "**Allowed roles**\n"
+
+        for roleid in roles:
+            role = discord.utils.get(msg.guild.roles, id=roleid)
+            tosend = tosend + "- " + role.name + "\n"
+
+        await msg.channel.send(tosend)
+
+    @bot.event
     async def on_raw_reaction_add(pl):
-        server = discord.utils.get(client.guilds, id=pl.guild_id)
+        server = discord.utils.get(bot.guilds, id=pl.guild_id)
         chnl = discord.utils.get(server.channels, id=pl.channel_id)
 
         # Get Base64 of Emoji.
@@ -91,11 +106,11 @@ def connect(cfg, conn):
 
         role = discord.utils.get(msg.guild.roles, id=results['roleid'])
         
-        await client.add_roles(pl.member, role)
+        await bot.add_roles(pl.member, role)
 
-    @client.event
+    @bot.event
     async def on_raw_reaction_remove(reaction, user):
-        server = discord.utils.get(client.guilds, id=pl.guild_id)
+        server = discord.utils.get(bot.guilds, id=pl.guild_id)
         chnl = discord.utils.get(server.channels, id=pl.channel_id)
 
         # Get Base64 of Emoji.
@@ -114,7 +129,7 @@ def connect(cfg, conn):
 
         role = discord.utils.get(msg.guild.roles, id=results['roleid'])
         
-        await client.remove_roles(pl.member, role)
+        await bot.remove_roles(pl.member, role)
             
     
-    client.run(cfg['BotToken'])
+    bot.run(cfg['BotToken'])
