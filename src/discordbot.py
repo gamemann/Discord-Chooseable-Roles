@@ -1,4 +1,5 @@
 import os
+import base64
 import discord
 
 import permissions
@@ -68,6 +69,52 @@ def connect(cfg, conn):
                 tosend = tosend + "- " + role.name + "\n"
 
             await msg.channel.send(tosend)
+
+    @client.event
+    async def on_raw_reaction_add(pl):
+        server = discord.utils.get(client.guilds, id=pl.guild_id)
+        chnl = discord.utils.get(server.channels, id=pl.channel_id)
+
+        # Get Base64 of Emoji.
+        name = base64.b64encode(pl.emoji.name.encode()).decode("utf-8")
+
+        # Get cursor.
+        cur = conn.cursor()
+
+        # Execute query.
+        cur.execute("SELECT `roleid` FROM `reactionroles` WHERE `msgid`=? AND `guildid`=? AND `reaction`=?", (pl.message_id, pl.guild_id, str(name)))
+
+        results = cur.fetchone()
+
+        if results == None or len(results) < 1:
+            return
+
+        role = discord.utils.get(msg.guild.roles, id=results['roleid'])
+        
+        await client.add_roles(pl.member, role)
+
+    @client.event
+    async def on_raw_reaction_remove(reaction, user):
+        server = discord.utils.get(client.guilds, id=pl.guild_id)
+        chnl = discord.utils.get(server.channels, id=pl.channel_id)
+
+        # Get Base64 of Emoji.
+        name = base64.b64encode(pl.emoji.name.encode()).decode("utf-8")
+
+        # Get cursor.
+        cur = conn.cursor()
+
+        # Execute query.
+        cur.execute("SELECT `roleid` FROM `reactionroles` WHERE `msgid`=? AND `guildid`=? AND `reaction`=?", (pl.message_id, pl.guild_id, str(name)))
+
+        results = cur.fetchone()
+
+        if results == None or len(results) < 1:
+            return
+
+        role = discord.utils.get(msg.guild.roles, id=results['roleid'])
+        
+        await client.remove_roles(pl.member, role)
             
     
     client.run(cfg['BotToken'])
