@@ -15,6 +15,7 @@ def main():
 
     # Get config from database.
     cfgfile = "/etc/dcr/settings.json"
+    
     if len(sys.argv) > 1 and sys.argv[1].startswith("cfg="):
         cfgfile = sys.argv[1].split('=')[1]
 
