@@ -15,7 +15,7 @@ async def handlecooldown(userid, cfg, guild):
     if cooldown != None and cooldown.get(userid, None) != None and cooldown[userid] > int(time.time()):
         user = await guild.fetch_member(userid)
         timetowait = cooldown[userid] - int(time.time())
-        await user.send("Please wait **" + str(int(timetowait)) + "** seconds before adding another reaction.")
+        await user.send("Please wait **" + str(int(timetowait)) + "** seconds before adding or removing another reaction.")
         return 1
     else:
         cooldown[userid] = int(time.time()) + cfg["Cooldown"]
@@ -264,8 +264,41 @@ def connect(cfg, conn):
 
             return
 
+        # Ensure we aren't reaching the max reactions.
+        reactions = 1
+        maxreactions = 1
+
+        cur.execute("SELECT COUNT(*) as count FROM `reactions` WHERE `userid`=? AND `msgid`=? AND `guildid`=?", (user.id, msg.id, guild.id))
+        conn.commit()
+        
+        results = cur.fetchone()
+        
+        if results != None and len(results) > 0:
+            reactions = results['count'] + 1
+
+        cur.execute("SELECT `maxreactions` FROM `messages` WHERE `msgid`=? AND `guildid`=?", (msg.id, guild.id))
+        conn.commit()
+
+        results = cur.fetchone()
+
+        if results != None and len(results) > 0:
+            maxreactions = results['maxreactions']
+
+        if reactions > maxreactions:
+            # Remove reaction.
+            await msg.remove_reaction(pl.emoji.name, user)
+
+            # DM user.
+            await user.send("You've reached the maximum reactions for this message/type (" + str(reactions) + "/" + str(maxreactions) + ")")
+
+            return
+
         # Get Base64 of Emoji.
         name = base64.b64encode(pl.emoji.name.encode()).decode("utf-8")
+
+        # Insert reaction into database.
+        cur.execute("INSERT OR REPLACE INTO `reactions` (`userid`, `msgid`, `guildid`, `reaction`) VALUES (?, ?, ?, ?)", (user.id, msg.id, guild.id, str(name)))
+        conn.commit()
 
         # Execute query.
         cur.execute("SELECT `roleid` FROM `reactionroles` WHERE `msgid`=? AND `guildid`=? AND `reaction`=?", (pl.message_id, pl.guild_id, str(name)))
@@ -290,14 +323,12 @@ def connect(cfg, conn):
         msg = await chnl.fetch_message(pl.message_id)
         user = await guild.fetch_member(pl.user_id)
 
-        # Handle cooldown.
-        if await handlecooldown(pl.user_id, cfg, guild):
-            await msg.remove_reaction(pl.emoji.name, user)
-
-            return
-
         # Get Base64 of Emoji.
         name = base64.b64encode(pl.emoji.name.encode()).decode("utf-8")
+
+        # Delete reaction entry from database.
+        cur.execute("DELETE FROM `reactions` WHERE `userid`=? AND `msgid`=? AND `guildid`=? AND `reaction`=?", (user.id, msg.id, guild.id, str(name)))
+        conn.commit()
 
         # Execute query.
         cur.execute("SELECT `roleid` FROM `reactionroles` WHERE `msgid`=? AND `guildid`=? AND `reaction`=?", (pl.message_id, pl.guild_id, str(name)))
