@@ -199,8 +199,6 @@ def connect(cfg, conn):
         cur.execute("INSERT OR REPLACE INTO `reactionroles` (`msgid`, `guildid`, `reaction`, `roleid`) VALUES (?, ?, ?, ?)", (msgid, ctx.guild.id, str(name), role.id))
         conn.commit()
 
-        print("Adding reaction based off " + str(name))
-
         # Add reaction to message.
         await msg.add_reaction(reaction)
 
