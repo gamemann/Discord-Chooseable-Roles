@@ -1,0 +1,5 @@
+{
+    "BotToken": "<BOT TOKEN>",
+    "Cooldown": 2.0,
+    "BotMsgStayTime": 10.0
+}
