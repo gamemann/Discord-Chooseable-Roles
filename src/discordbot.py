@@ -297,10 +297,6 @@ def connect(cfg, conn):
         # Get Base64 of Emoji.
         name = base64.b64encode(pl.emoji.name.encode()).decode("utf-8")
 
-        # Insert reaction into database.
-        cur.execute("INSERT OR REPLACE INTO `reactions` (`userid`, `msgid`, `guildid`, `reaction`) VALUES (?, ?, ?, ?)", (user.id, msg.id, guild.id, str(name)))
-        conn.commit()
-
         # Execute query.
         cur.execute("SELECT `roleid` FROM `reactionroles` WHERE `msgid`=? AND `guildid`=? AND `reaction`=?", (pl.message_id, pl.guild_id, str(name)))
         conn.commit()
@@ -309,6 +305,10 @@ def connect(cfg, conn):
 
         if results == None or len(results) < 1:
             return
+
+        # Insert reaction into database.
+        cur.execute("INSERT OR REPLACE INTO `reactions` (`userid`, `msgid`, `guildid`, `reaction`) VALUES (?, ?, ?, ?)", (user.id, msg.id, guild.id, str(name)))
+        conn.commit()
 
         role = discord.utils.get(msg.guild.roles, id=results['roleid'])
         
