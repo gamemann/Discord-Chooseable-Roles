@@ -26,7 +26,7 @@ def addrole(conn, guildid, role):
     results = "{\"roles\": []}"
     query = cur.fetchone()
 
-    if len(query) > 0 and query != None:
+    if query != None and len(query) > 0:
         results = query['roles']
 
     roles = json.loads(results)
@@ -50,7 +50,7 @@ def delrole(conn, guildid, role):
     # Fetch the results, deserialize JSON, add role, and serialize/update.
     results = cur.fetchone()
 
-    if len(results) < 1 or results == None:
+    if results == None or len(results) < 1:
         return 1
 
     roles = json.loads(results['roles'])
@@ -76,7 +76,7 @@ def getroles(conn, guildid):
 
     results = cur.fetchone()
 
-    if len(results) > 0 and results != None:
+    if results != None and len(results) > 0:
         roles = json.loads(results['roles'])
 
     return roles['roles']
