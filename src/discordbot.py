@@ -285,6 +285,28 @@ def connect(cfg, conn):
 
         await ctx.channel.send("**Successfully** removed reaction.", delete_after=cfg["BotMsgStayTime"])
 
+    @bot.command()
+    async def dcr_clearuser(ctx, userid=None):
+        # Check arguments and ensure they're all valid.
+        usage = "**Usage** - !dcr_clearuser <userid>."
+
+        if userid == None:
+            await ctx.channel.send(usage + "\n\nError - User argument not specified.")
+
+            return
+
+        # Try to fetch user and if they aren't found, let the admin know.
+        try:
+            user = await ctx.guild.fetch_member(userid)
+        except NotFound:
+            ctx.channel.send("**WARNING** - User not found. We will continue with clearing the user, though.", delete_after=cfg["BotMsgStayTime"])
+
+        # Execute query to delete all rows in `reactions` table from user.
+        cur.execute("DELETE FROM `reactions` WHERE `userid`=? AND `msgid`=? AND `guildid`=?", (int(userid), ctx.message.id, ctx.guild.id))
+        conn.commit()
+
+        await ctx.channel.send("Deleted all reactions for user!")
+
     @bot.event
     async def on_raw_reaction_add(pl):
         # Check to ensure reaction user isn't the bot itself.
