@@ -122,7 +122,8 @@ def connect(cfg, conn):
             return
 
         # Add message to current channel.
-        newmsg = await ctx.channel.send(contents)
+        newmsg = await ctx.channel.send(contents.replace(r'\n', '\n'))
+        print (str(contents))
 
         cur.execute("INSERT INTO `messages` (`msgid`, `guildid`, `maxreactions`, `contents`) VALUES (?, ?, ?, ?)", (newmsg.id, ctx.guild.id, maxreactions, contents))
         conn.commit()
@@ -150,8 +151,8 @@ def connect(cfg, conn):
 
         # Check contents.
         if contents != None and contents != "SKIP":
-            setparams["contents"] = contents
-            await msg.edit(content=contents)
+            setparams["contents"] = str(contents)
+            await msg.edit(content=contents.replace(r'\n', '\n'))
 
         # Use our helper function to update the row inside of the messages table.
         db.updateoptional(conn, "messages", setparams, whereparams)
