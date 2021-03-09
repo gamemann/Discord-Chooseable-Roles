@@ -251,13 +251,41 @@ def connect(cfg, conn):
 
     @bot.event
     async def on_raw_reaction_add(pl):
+        # Check to ensure reaction user isn't the bot itself.
         if pl.user_id == bot.user.id:
             return
 
         guild = await bot.fetch_guild(pl.guild_id)
+
+        # Check guild.
+        if guild == None:
+            print("on_raw_reaction_add() :: Could not find guild with ID #" + str(pl.guild_id))
+
+            return
+
         chnl = bot.get_channel(pl.channel_id)
+
+        # Check channel.
+        if chnl == None:
+            print("on_raw_reaction_add() :: Could not find channel with ID #" + str(pl.channel_id))
+
+            return
+        
         msg = await chnl.fetch_message(pl.message_id)
+
+        # Check message.
+        if msg == None:
+            print("on_raw_reaction_add() :: Could not find message with ID #" + str(pl.message_id))
+
+            return
+
         user = await guild.fetch_member(pl.user_id)
+
+        # Check user.
+        if user == None:
+            print("on_raw_reaction_add() :: Could not find user with ID #" + str(pl.user_id))
+
+            return
 
         # Handle cooldown.
         if await handlecooldown(pl.user_id, cfg, guild):
@@ -311,6 +339,7 @@ def connect(cfg, conn):
 
         if role == None:
             print("Failed to find role with ID #" + str(results['roleid']))
+
             return
         
         await pl.member.add_roles(role)
@@ -325,9 +354,36 @@ def connect(cfg, conn):
             return
 
         guild = await bot.fetch_guild(pl.guild_id)
+
+        # Check guild.
+        if guild == None:
+            print("on_raw_reaction_remove() :: Could not find guild with ID #" + str(pl.guild_id))
+
+            return
+
         chnl = bot.get_channel(pl.channel_id)
+
+        # Check channel.
+        if chnl == None:
+            print("on_raw_reaction_remove() :: Could not find channel with ID #" + str(pl.channel_id))
+
+            return
+        
         msg = await chnl.fetch_message(pl.message_id)
+
+        # Check message.
+        if msg == None:
+            print("on_raw_reaction_remove() :: Could not find message with ID #" + str(pl.message_id))
+
+            return
+
         user = await guild.fetch_member(pl.user_id)
+
+        # Check user.
+        if user == None:
+            print("on_raw_reaction_remove() :: Could not find user with ID #" + str(pl.user_id))
+
+            return
 
         # Get Base64 of Emoji.
         name = base64.b64encode(pl.emoji.name.encode()).decode("utf-8")
