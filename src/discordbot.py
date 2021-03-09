@@ -306,13 +306,18 @@ def connect(cfg, conn):
         if results == None or len(results) < 1:
             return
 
+        # Retrieve role and ensure it exist.
+        role = discord.utils.get(msg.guild.roles, id=results['roleid'])
+
+        if role == None:
+            print("Failed to find role with ID #" + str(results['roleid']))
+            return
+        
+        await pl.member.add_roles(role)
+
         # Insert reaction into database.
         cur.execute("INSERT OR REPLACE INTO `reactions` (`userid`, `msgid`, `guildid`, `reaction`) VALUES (?, ?, ?, ?)", (user.id, msg.id, guild.id, str(name)))
         conn.commit()
-
-        role = discord.utils.get(msg.guild.roles, id=results['roleid'])
-        
-        await pl.member.add_roles(role)
 
     @bot.event
     async def on_raw_reaction_remove(pl):
