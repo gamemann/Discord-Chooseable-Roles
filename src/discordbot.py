@@ -55,7 +55,7 @@ def connect(cfg, conn):
 
         # Check role.
         if role == None:
-            ctx.channel.send("Could not find role specified.")
+            await ctx.channel.send("Could not find role specified.")
 
             return
 
@@ -93,7 +93,7 @@ def connect(cfg, conn):
 
         # Check role.
         if role == None:
-            ctx.channel.send("Could not find role specified.")
+            await ctx.channel.send("Could not find role specified.")
 
             return
 
