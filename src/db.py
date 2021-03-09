@@ -27,3 +27,4 @@ def updateoptional(conn, table, setparams, whereparams):
     querystr = "UPDATE " + table + " SET " + setstr + " WHERE " + wherestr
 
     cur.execute(querystr, values)
+    conn.commit()
