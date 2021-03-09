@@ -252,7 +252,6 @@ def connect(cfg, conn):
         results = cur.fetchone()
 
         if results == None or len(results) < 1:
-            print("Didn't find anything for th is reaction: " + str(name))
             return
 
         role = discord.utils.get(msg.guild.roles, id=results['roleid'])
