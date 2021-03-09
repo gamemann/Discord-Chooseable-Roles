@@ -11,14 +11,14 @@ def main():
     conn = db.connect()
 
     # Attempt to setup tables if they aren't already along with get information.
-    if len(sys.argv) > 1 and str(sys.argv[1]) == "setup":
-        setup.setuptables(conn)
-
-        if len(sys.argv) < 3 or (len(sys.argv) > 2 and str(sys.argv[2]) != "skipcfg"):
-            setup.setupcfg(conn)
+    setup.setuptables(conn)
 
     # Get config from database.
-    cfg = config.getconfig(conn)
+    cfgfile = "/etc/dcr/settings.json"
+    if len(sys.argv) > 1 and sys.argv[1].startswith("cfg="):
+        cfgfile = sys.argv[1].split('=')[1]
+
+    cfg = config.getconfig(cfgfile)
 
     # Connect Discord bot.
     discordbot.connect(cfg, conn)

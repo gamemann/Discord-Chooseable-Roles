@@ -1,10 +1,9 @@
-def getconfig(conn):
+import json
+
+def getconfig(cfgfile):
     cfg = {}
-    cur = conn.cursor()
-
-    cur.execute("SELECT * FROM `config`")
-
-    for row in cur.fetchall():
-        cfg[row['key']] = row['value']
+    
+    with open(cfgfile) as f:
+        cfg = json.load(f)
     
     return cfg
