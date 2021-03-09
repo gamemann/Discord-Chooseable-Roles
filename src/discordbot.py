@@ -1,14 +1,28 @@
 import os
 import base64
+import time
+
 import discord
 from discord.ext import commands
 
 import permissions
 import db
 
-def connect(cfg, conn):
-    bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='!')
+cooldown = {}
 
+async def handlecooldown(userid, cfg, guild):
+    if cooldown != None and cooldown.get(userid, None) != None and cooldown[userid] > int(time.time()):
+        user = await guild.fetch_member(userid)
+        timetowait = cooldown[userid] - int(time.time())
+        await user.send("Please wait **" + str(int(timetowait)) + "** seconds before adding another reaction.")
+        return 1
+    else:
+        cooldown[userid] = int(time.time()) + cfg["Cooldown"]
+
+    return 0
+
+def connect(cfg, conn):
     # Enable intents.
     intents = discord.Intents.default()
     intents.members = True 
@@ -239,8 +253,16 @@ def connect(cfg, conn):
         if pl.user_id == bot.user.id:
             return
 
+        guild = await bot.fetch_guild(pl.guild_id)
         chnl = bot.get_channel(pl.channel_id)
         msg = await chnl.fetch_message(pl.message_id)
+        user = await guild.fetch_member(pl.user_id)
+
+        # Handle cooldown.
+        if await handlecooldown(pl.user_id, cfg, guild):
+            await msg.remove_reaction(pl.emoji.name, user)
+
+            return
 
         # Get Base64 of Emoji.
         name = base64.b64encode(pl.emoji.name.encode()).decode("utf-8")
@@ -263,8 +285,16 @@ def connect(cfg, conn):
         if pl.user_id == bot.user.id:
             return
 
+        guild = await bot.fetch_guild(pl.guild_id)
         chnl = bot.get_channel(pl.channel_id)
         msg = await chnl.fetch_message(pl.message_id)
+        user = await guild.fetch_member(pl.user_id)
+
+        # Handle cooldown.
+        if await handlecooldown(pl.user_id, cfg, guild):
+            await msg.remove_reaction(pl.emoji.name, user)
+
+            return
 
         # Get Base64 of Emoji.
         name = base64.b64encode(pl.emoji.name.encode()).decode("utf-8")
