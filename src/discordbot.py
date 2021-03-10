@@ -37,6 +37,10 @@ def connect(cfg, conn):
 
     @bot.command()
     async def dcr_addrole(ctx, name=None):
+        # Handle cooldown.
+        if await handlecooldown(ctx.author.id, cfg, ctx.guild):
+            return
+
         usage = "**Usage** - !dcr_addrole <role name>"
         msg = ctx.message
 
@@ -75,6 +79,10 @@ def connect(cfg, conn):
 
     @bot.command()
     async def dcr_delrole(ctx, name=None):
+        # Handle cooldown.
+        if await handlecooldown(ctx.author.id, cfg, ctx.guild):
+            return
+
         usage = "**Usage** - !dcr_delrole <role name>"
         msg = ctx.message
 
@@ -113,6 +121,10 @@ def connect(cfg, conn):
 
     @bot.command()
     async def dcr_listroles(ctx):
+        # Handle cooldown.
+        if await handlecooldown(ctx.author.id, cfg, ctx.guild):
+            return
+
         msg = ctx.message
 
         roles = permissions.getroles(conn, msg.guild.id)
@@ -130,6 +142,10 @@ def connect(cfg, conn):
 
     @bot.command()
     async def dcr_addmsg(ctx, maxreactions=1, contents=""):
+        # Handle cooldown.
+        if await handlecooldown(ctx.author.id, cfg, ctx.guild):
+            return
+
         msg = ctx.message
 
         roles = permissions.getroles(conn, msg.guild.id)
@@ -146,6 +162,10 @@ def connect(cfg, conn):
 
     @bot.command()
     async def dcr_editmsg(ctx, msgid=None, maxreactions=None, contents=None):
+        # Handle cooldown.
+        if await handlecooldown(ctx.author.id, cfg, ctx.guild):
+            return
+
         # Check arguments and ensure they're all valid.
         usage = "**Usage**: !dcr_editmsg <msgid> <maxreactions=None> <contents=None>."
         
@@ -182,6 +202,10 @@ def connect(cfg, conn):
 
     @bot.command()
     async def dcr_delmsg(ctx, msgid=None):
+        # Handle cooldown.
+        if await handlecooldown(ctx.author.id, cfg, ctx.guild):
+            return
+
         # Check arguments and ensure they're all valid.
         usage = "**Usage**: !dcr_delmsg <msgid>."
 
@@ -209,6 +233,10 @@ def connect(cfg, conn):
 
     @bot.command()
     async def dcr_addreaction(ctx, msgid=None, reaction=None, rolename=None):
+        # Handle cooldown.
+        if await handlecooldown(ctx.author.id, cfg, ctx.guild):
+            return
+
         # Check arguments and ensure they're all valid.
         usage = "**Usage** - !dcr_addreaction <msgid> <reaction> <role name>."
 
@@ -252,6 +280,10 @@ def connect(cfg, conn):
 
     @bot.command()
     async def dcr_delreaction(ctx, msgid=None, reaction=None):
+        # Handle cooldown.
+        if await handlecooldown(ctx.author.id, cfg, ctx.guild):
+            return
+
         # Check arguments and ensure they're all valid.
         usage = "**Usage** - !dcr_delreaction <msgid> <reaction>."
 
@@ -287,6 +319,10 @@ def connect(cfg, conn):
 
     @bot.command()
     async def dcr_clearuser(ctx, userid=None):
+        # Handle cooldown.
+        if await handlecooldown(ctx.author.id, cfg, ctx.guild):
+            return
+
         # Check arguments and ensure they're all valid.
         usage = "**Usage** - !dcr_clearuser <userid>."
 
