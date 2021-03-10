@@ -298,6 +298,11 @@ def connect(cfg, conn):
         # Get role so we can insert by ID.
         role = discord.utils.get(ctx.guild.roles, name=rolename)
 
+        if role == None:
+            await ctx.channel.send("Reaction role not found.", delete_after=cfg['BotMsgStayTime'])
+
+            return
+
         # Insert or replace into database.
         cur.execute("INSERT OR REPLACE INTO `reactionroles` (`msgid`, `guildid`, `reaction`, `roleid`) VALUES (?, ?, ?, ?)", (msgid, ctx.guild.id, str(name), role.id))
         conn.commit()
