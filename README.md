@@ -65,10 +65,10 @@ Lists all of the allowed roles.
 
 ### dcr_addmsg
 ```
-!dcr_addmsg <max reactions> <contents>
+!dcr_addmsg <max reactions> <contents> <message ID>
 ```
 
-Adds a message for people to react on. `Max reactions` indicates the maximum reactions a user can select at once. `Contents` indicates the message's contents (you may use the `\n` character for new lines). If the message's contents are set to "SKIP", it will not submit a new message nor edit the contents of the message. This is useful if you want to add reactions for a non-bot message.
+Adds a message for people to react on. `Max reactions` indicates the maximum reactions a user can select at once. `Contents` indicates the message's contents (you may use the `\n` character for new lines). If the message's contents are set to "SKIP", it will not submit a new message nor edit the contents of the message. This is useful if you want to add reactions for a non-bot message. `Message ID` is optional and is only used if you want to add an existing message instead of a new one which may be easier for those that want to modify the message.
 
 ### dcr_editmsg
 ```
