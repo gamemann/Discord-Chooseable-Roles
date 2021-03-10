@@ -141,7 +141,7 @@ def connect(cfg, conn):
         await msg.channel.send(tosend, delete_after=cfg['BotMsgStayTime'])
 
     @bot.command()
-    async def dcr_addmsg(ctx, maxreactions=1, contents=""):
+    async def dcr_addmsg(ctx, maxreactions=1, contents="", msgid=None):
         # Handle cooldown.
         if await handlecooldown(ctx.author.id, cfg, ctx.guild):
             return
@@ -154,11 +154,40 @@ def connect(cfg, conn):
         if not permissions.hasperm(conn, roles, msg.author):
             return
 
-        # Add message to current channel.
-        newmsg = await ctx.channel.send(contents.replace(r'\n', '\n'))
+        # The message ID to add.
+        id = None
 
-        cur.execute("INSERT INTO `messages` (`msgid`, `guildid`, `maxreactions`, `contents`) VALUES (?, ?, ?, ?)", (newmsg.id, ctx.guild.id, maxreactions, contents))
+        # Check for message ID argument.
+        if msgid != None:
+            # Try to obtain message by ID.
+            existingmsg = None
+
+            try:
+                existingmsg = await ctx.fetch_message(msgid)
+            except NotFound:
+                await ctx.channel.send("Message ID not found inside of guild.", delete_after=cfg['BotMsgStayTime'])
+
+                return
+            
+            # Assign ID to existing message ID.
+            id = existingmsg.id
+
+        # Add message to current channel.
+        if id == None:
+            newmsg = await ctx.channel.send(contents.replace(r'\n', '\n'))
+
+            # Check new message.
+            if newmsg == None:
+                ctx.channel.send("Failed to create new message.")
+
+                return
+            
+            id = newmsg.id
+
+        cur.execute("INSERT or REPLACE INTO `messages` (`msgid`, `guildid`, `maxreactions`, `contents`) VALUES (?, ?, ?, ?)", (id, ctx.guild.id, maxreactions, contents))
         conn.commit()
+
+        await ctx.channel.send("**Successfully** added message!", delete_after=cfg['BotMsgStayTime'])
 
     @bot.command()
     async def dcr_editmsg(ctx, msgid=None, maxreactions=None, contents=None):
