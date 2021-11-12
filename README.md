@@ -1,4 +1,4 @@
-# Discord Choosable Roles (WIP)
+# Discord Choosable Roles
 ## Description
 A small open-source Discord Bot written in Python which allows you to react to messages and obtain a role. This is being used in a personal Discord server of mine.
 
