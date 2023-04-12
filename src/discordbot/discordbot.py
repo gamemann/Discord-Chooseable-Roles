@@ -4,11 +4,12 @@ import time
 
 import discord
 from discord.ext import commands
+from discord import Intents
 
 import permissions
 import db
 
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='!', intents=Intents.all())
 cooldown = {}
 
 async def handlecooldown(userid, cfg, guild):
@@ -23,11 +24,7 @@ async def handlecooldown(userid, cfg, guild):
 
     return 0
 
-def connect(cfg, conn):
-    # Enable intents.
-    intents = discord.Intents.default()
-    intents.members = True 
-    
+def connect(cfg, conn):    
     # Get connection cursor.
     cur = conn.cursor()
 

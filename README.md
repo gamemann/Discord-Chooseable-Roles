@@ -23,6 +23,11 @@ The Discord.py [package](https://pypi.org/project/discord.py/) is required in or
 python3 -m pip install -U discord.py
 ```
 
+### Enable Intents
+You must enable intents within the Discord Developers portal under your project's "Bot" tab. You should only need "Server Members Intent", but I've enabled all three just in-case.
+
+![Intents Image](./images/intents.png)
+
 ## Command Line Usage
 You may specify the settings JSON (used for the bot token, etc) and the SQLite DB location within the command line. The default settings location is `/etc/dcr/settings.json` and the default SQLite DB location is `/etc/dcr/dcr.db`.
 
