@@ -1,5 +1,3 @@
-# Discord Choosable Roles
-## Description
 A small open-source Discord Bot written in Python which allows you to react to messages and obtain a role. This is being used in a personal Discord server of mine.
 
 Please note this is one of my first official Python projects and I went into this without much knowledge of Python itself along with no experience with the [Discord.py](https://discordpy.readthedocs.io/en/latest/index.html) wrapper. Therefore, there's a chance a lot of this code can be improved.
